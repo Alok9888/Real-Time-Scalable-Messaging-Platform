@@ -1,140 +1,124 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
+import axios from "axios";
+import toast from "react-hot-toast";
+import { BASE_URL } from '..';
+
 
 const SignUp = () => {
-  const [showPassword, setShowPassword] = useState(false);
-
+  const [user, setUser] = useState({
+    fullName: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    gender: "",
+  });
+  const navigate = useNavigate();
+  const handleCheckbox = (gender) => {
+    setUser({ ...user, gender });
+  }
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${BASE_URL}/api/v1/user/register`, user, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      if (res.data.success) {
+        navigate("/login");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.log(error);
+    }
+    setUser({
+      fullName: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      gender: "",
+    })
+  }
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/95 p-8 shadow-2xl backdrop-blur-sm">
-        {/* Header */}
-        <div className="mb-7 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500 text-2xl text-white shadow-lg">
-            💬
-          </div>
-
-          <h1 className="text-3xl font-bold text-gray-900">
-            Create Account
-          </h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Sign up to start chatting with friends.
-          </p>
-        </div>
-
-        <form className="space-y-4">
-          {/* Full Name */}
+    <div className="min-w-96 mx-auto">
+      <div className='w-full p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border border-gray-100'>
+        <h1 className='text-3xl font-bold text-center'>Signup</h1>
+        <form onSubmit={onSubmitHandler} action="">
           <div>
-            <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Full Name
+            <label className='label p-2'>
+              <span className='text-base label-text'>Full Name</span>
             </label>
             <input
-              id="fullName"
-              name="fullName"
+              value={user.fullName}
+              onChange={(e) => setUser({ ...user, fullName: e.target.value })}
+              className='w-full input input-bordered h-10'
               type="text"
-              placeholder="Enter your full name"
-              autoComplete="name"
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            />
+              placeholder='Full Name' />
           </div>
-
-          {/* Username */}
           <div>
-            <label htmlFor="userName" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Username
+            <label className='label p-2'>
+              <span className='text-base label-text'>Username</span>
             </label>
             <input
-              id="userName"
-              name="userName"
+              value={user.username}
+              onChange={(e) => setUser({ ...user, username: e.target.value })}
+              className='w-full input input-bordered h-10'
               type="text"
-              placeholder="Choose a username"
-              autoComplete="username"
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            />
+              placeholder='Username' />
           </div>
-
-          {/* Gender */}
           <div>
-            <label htmlFor="gender" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Gender
-            </label>
-            <select
-              id="gender"
-              name="gender"
-              required
-              defaultValue=""
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            >
-              <option value="" disabled>
-                Select your gender
-              </option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Password */}
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Password
+            <label className='label p-2'>
+              <span className='text-base label-text'>Password</span>
             </label>
             <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Create a password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            />
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+              className='w-full input input-bordered h-10'
+              type="password"
+              placeholder='Password' />
           </div>
-
-          {/* Confirm Password */}
           <div>
-            <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Confirm Password
+            <label className='label p-2'>
+              <span className='text-base label-text'>Confirm Password</span>
             </label>
             <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              placeholder="Re-enter your password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-            />
-            <label className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+              value={user.confirmPassword}
+              onChange={(e) => setUser({ ...user, confirmPassword: e.target.value })}
+              className='w-full input input-bordered h-10'
+              type="password"
+              placeholder='Confirm Password' />
+          </div>
+          <div className='flex items-center my-4'>
+            <div className='flex items-center'>
+              <p>Male</p>
               <input
                 type="checkbox"
-                checked={showPassword}
-                onChange={(e) => setShowPassword(e.target.checked)}
-                className="accent-red-500"
-              />
-              Show passwords
-            </label>
+                checked={user.gender === "male"}
+                onChange={() => handleCheckbox("male")}
+                defaultChecked
+                className="checkbox mx-2" />
+            </div>
+            <div className='flex items-center'>
+              <p>Female</p>
+              <input
+                type="checkbox"
+                checked={user.gender === "female"}
+                onChange={() => handleCheckbox("female")}
+                defaultChecked
+                className="checkbox mx-2" />
+            </div>
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-red-500 py-3 font-semibold text-white shadow-md transition hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-          >
-            Create Account
-          </button>
+          <p className='text-center my-2'>Already have an account? <Link to="/login"> login </Link></p>
+          <div>
+            <button type='submit' className='btn btn-block btn-sm mt-2 border border-slate-700'>Singup</button>
+          </div>
         </form>
-
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="font-semibold text-red-500 hover:text-red-600">
-            Log in
-          </a>
-        </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default SignUp
